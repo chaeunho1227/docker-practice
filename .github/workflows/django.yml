@@ -15,14 +15,11 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v3
-
-    - name: workdirectory
-      run: |
-        cd backend
         
     - name: Create .env
       shell: bash
       run: |
+        cd backend
         touch .env
         echo SECRET_KEY=${{ secrets.DJANGO_SECRET_KEY }} >> .env
         cat .env
@@ -34,18 +31,22 @@ jobs:
             
     - name: Install dependencies
       run: |
+        cd backend
         python -m pip install --upgrade pip
         pip3 install -r requirements.txt
             
     - name: Run tests
       run: |
+        cd backend
         python3 manage.py test
 
   
     ###  makemigration & migrate 이부분은 CI/CD가 진행되면 db가 날라가기에 db를 분리하는 게 좋아보임
     - name: migrate
       run: |
-        python3 manage.py test
+        cd backend
+        python3 manage.py makemigrations
+        python3 manage.py makemigrate
 
     ### Docker Image Build and Push ###
     - name: Login to Docker Hub
@@ -63,7 +64,7 @@ jobs:
       if: github.event.pull_request.merged == true
       uses: docker/build-push-action@v4
       with:
-        context: .
+        context: ./backend
         file: ./Dockerfile
         push: true
         tags: ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPONAME }}
