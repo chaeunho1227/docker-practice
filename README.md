@@ -1,2 +1,2 @@
 # docker-practice
-축제 사이트 배포 연습용입니다.
+docker를 이용한 django-gunicorn-nginx배포 연습용입니다.
